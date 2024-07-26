@@ -1,0 +1,130 @@
+*,
+*::before,
+*::after {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-family: "Roboto", sans-serif;
+    font-weight: 900;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+.calculator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 3%;
+    
+    display: grid;
+    grid-template-rows: 1fr 2fr;
+
+
+    width: 300px;
+    height: 400px;
+
+    background-color: rgb(175, 238, 238);
+}
+
+.container.\31 {
+    display: flex;
+
+    width: 100%;
+}
+
+.container.\31  .sub-container {
+    display: grid;
+    grid-template-rows: 1fr 3fr;
+
+    width: 90%;
+    height: 80%;
+
+    border-radius: 10px;
+
+    margin: auto;
+
+    background: white;
+}
+
+.main, .secondary {
+    display: flex;
+
+    justify-content: right;
+    align-items: end;
+
+    margin-right: 1rem;
+}
+
+.main {
+    margin-bottom: 1rem;
+}
+
+#main {
+    font-size: 400%;
+}
+
+.container.\32 {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+}
+
+.container.\32  .sub-container {
+
+}
+
+.container.\32  .sub-container.\31 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.container.\32  .sub-container.\32 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.sub-sub-container {
+    position: relative;
+    pointer-events: none;
+}
+
+.sub-sub-container:hover {
+    cursor: pointer;
+}
+
+.sub-sub-container::before {
+    content: '';
+    pointer-events: auto;
+
+    position: absolute;
+
+    top: 50%;
+    bottom: 0;
+    left: 50%;
+    
+    transform: translate(-50%, -50%);
+
+    border-radius: 10px;
+    
+    width: 30px;
+
+    background: white;
+}
+
+.sub-sub-container p {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.sub-sub-container p:hover {
+    cursor: pointer;
+}
