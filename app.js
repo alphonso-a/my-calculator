@@ -13,7 +13,9 @@ document.querySelectorAll('.input').forEach(input => {
     })
 })
 
-const inputSize = window.getComputedStyle(document.getElementById('main')).getPropertyValue('font-size');
+const input = document.getElementById('main');
+const inputSize = window.getComputedStyle(input).getPropertyValue('font-size');
+const inputStyle = input.style;
 
 const equation = {
     first: null,
@@ -55,20 +57,14 @@ removeDigit = () => {
 }
 
 changeSize = mode => {
-
-    if(mode === '-'){
-
-        document.getElementById('main').style.fontSize = (parseFloat(document.getElementById('main').style.fontSize) + 3) + 'px';
-
-    }else{
-
-        document.getElementById('main').style.fontSize = (parseFloat(inputSize) - (3 * num.length)) + 'px';
-
-    }
+    if(mode === '-')
+        inputStyle.fontSize = (parseFloat(inputStyle.fontSize) + 3) + 'px';
+    else
+        inputStyle.fontSize = (parseFloat(inputSize) - (3 * num.length)) + 'px';
 }
 
 defaultSize = () => {
-    document.getElementById('main').style.fontSize = null;
+    inputStyle.fontSize = null;
 }
 
 
