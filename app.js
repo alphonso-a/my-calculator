@@ -50,10 +50,12 @@ removeDigit = () => {
 
     output(num);
     
-    if(num.length == 0)
+    if(num.length == 0){
         defaultSize();
-    else
+        output(0);
+    }else{
         changeSize('-');
+    }
 }
 
 changeSize = mode => {
@@ -75,8 +77,8 @@ deleteInput = () => {
     reset();
     temp = null;
 
-    output("");
-    subOutput("");
+    output(0);
+    eqOutput("");
 }
 
 finalizeNumber = () => { 
@@ -136,7 +138,7 @@ addFirst = (operation , num, operator) => {
         temp = finalizeEquation(operation); 
     
     reset();
-    subOutput();
+    eqOutput();
 }
 
 addSecond = (operation , num, operator) => {
@@ -167,7 +169,8 @@ finalizeEquation = operation => {
                                 operation.second)
     
     output(operation.result);
-    subOutput();
+    eqOutput();
+    eqHistory();
     return operation.result;
 }
 
@@ -184,7 +187,7 @@ output = value => {
         mainOutput.innerText = value;
 }
 
-subOutput = value => {
+eqOutput = value => {
     var subOutput = document.getElementById('sub');
 
     if (value != null) {
@@ -207,6 +210,21 @@ subOutput = value => {
     subOutput.innerText = output;
 }
 
+eqHistory = () => {
+    var history = document.getElementById('history');
+
+    history.innerHTML = '';
+
+    for(let i = 0; i < equations.length; i++){
+        let equation = '<div class="equation" id="' + i + '">'+ 
+        '<p class="expression">' + equations[i].first + ' ' + equations[i].operator + ' ' + equations[i].second + '</p>' + 
+        '<p class="answer">' + ' = ' + equations[i].result + '</p>' +
+        '</div>' ;
+
+        history.innerHTML += equation;
+    }
+}
+
 changeOperator = operator => {
     equations[0].operator = operator;
     
@@ -215,7 +233,7 @@ changeOperator = operator => {
         reset();
     }
 
-    subOutput();
+    eqOutput();
 }
 
 applySymbol = symbol => {
@@ -255,7 +273,6 @@ applySymbol = symbol => {
 
     if(symbol === 'delete'){
         deleteInput();
-        output('0');
         return
     }
 
