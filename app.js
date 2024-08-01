@@ -6,10 +6,15 @@ document.querySelectorAll('.sub-sub-container').forEach(sub_sub_container => {
 
 document.querySelectorAll('.input').forEach(input => {
     input.addEventListener('click', event => {
-        if(input.classList.contains('digit'))
-            addDigit(input.getAttribute('id'));
+        if(input.classList.contains('digit') 
+            && num.length < 9)
+            addDigit(
+                input.getAttribute('id')
+            );
         if(input.classList.contains('symbol'))
-            applySymbol(input.getAttribute('id'));
+            applySymbol(
+                input.getAttribute('id')
+            );
     })
 })
 
@@ -39,7 +44,6 @@ addDigit = digit => {
 
     num.push(digit);
     output(num);
-    changeSize();
 }
 
 removeDigit = () => {
@@ -50,25 +54,9 @@ removeDigit = () => {
 
     output(num);
     
-    if(num.length == 0){
-        defaultSize();
+    if(num.length == 0)
         output(0);
-    }else{
-        changeSize('-');
-    }
 }
-
-changeSize = mode => {
-    if(mode === '-')
-        inputStyle.fontSize = (parseFloat(inputStyle.fontSize) + 3) + 'px';
-    else
-        inputStyle.fontSize = (parseFloat(inputSize) - (3 * num.length)) + 'px';
-}
-
-defaultSize = () => {
-    inputStyle.fontSize = null;
-}
-
 
 deleteInput = () => {
     if(equations[0] != null && equations[0].result === null)
@@ -168,10 +156,20 @@ finalizeEquation = operation => {
                                 operation.operator + 
                                 operation.second)
     
-    output(operation.result);
+
+    output(notation(operation.result));
+
     eqOutput();
     eqHistory();
     return operation.result;
+}
+
+notation = value => {
+    if(value.toString().length > 9){
+        return Number.parseFloat(value).toExponential(5);
+    }else{
+        return value;
+    }
 }
 
 output = value => {
@@ -185,6 +183,8 @@ output = value => {
     }
     else
         mainOutput.innerText = value;
+
+    
 }
 
 eqOutput = value => {
@@ -195,12 +195,12 @@ eqOutput = value => {
         return
     }
 
-    let output = equations[0].first + 
+    let output = notation(equations[0].first) + 
                  " " + 
                  equations[0].operator;
 
     if(equations[0].second != null)
-        output += " " + equations[0].second;
+        output += " " + notation(equations[0].second);
 
     if(equations[0].result != null &&
        equations[0].operator != "=")
@@ -213,13 +213,20 @@ eqOutput = value => {
 eqHistory = () => {
     var history = document.getElementById('history');
 
+
     history.innerHTML = '';
 
     for(let i = 0; i < equations.length; i++){
-        let equation = '<div class="equation" id="' + i + '">'+ 
-        '<p class="expression">' + equations[i].first + ' ' + equations[i].operator + ' ' + equations[i].second + '</p>' + 
-        '<p class="answer">' + ' = ' + equations[i].result + '</p>' +
-        '</div>' ;
+        let equation = '<div class="equation" id="' + i + '">'
+        + '<p class="expression">' 
+            + notation(equations[i].first)
+            + ' ' 
+            + (equations[i].operator === '=' ? ' ' : equations[i].operator) 
+            + ' ' 
+            + (equations[i].second === null ? ' ' : equations[i].second) + 
+        '</p>' 
+        + '<p class="answer">' + ' = ' + notation(equations[i].result) + '</p>' 
+        + '</div>' ;
 
         history.innerHTML += equation;
     }
