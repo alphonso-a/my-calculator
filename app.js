@@ -32,15 +32,14 @@ const equation = {
 var equations = [];
 
 var num = [];
-var temp = null;
+var lastResult = null;
 
 var positive = true;
 var x = 0.1; 
 var y = 0.1;
 
 addDigit = digit => {
-    if (temp != null)
-        temp = null
+    lastResult = null;
 
     num.push(digit);
     output(num);
@@ -49,8 +48,6 @@ addDigit = digit => {
 removeDigit = () => {
     if(num.length != 0)
         num.pop();
-
-    temp = null;
 
     output(num);
     
@@ -63,13 +60,12 @@ deleteInput = () => {
         equations.shift();
     
     reset();
-    temp = null;
 
     output(0);
     eqOutput("");
 }
 
-finalizeNumber = () => { 
+finalizeOp = () => { 
     if(num.length === 0)
         return null;
 
@@ -88,54 +84,53 @@ combineDigits = () => {
         return Number(numStr);
 }
 
-handleEquation = (num, operator = null) => {
-    var operation;
-
+parseEq = (num, operator = null) => {
+    var op;
 
     if(num === null)
         return
 
-    operation = initializeEquation(operation);
+    op = initEq(op);
 
-    if(operation.first === null){
-        addFirst(operation, num, operator); 
-        console.log(operation);
+    if(op.first === null){
+        addFirst(op, num, operator); 
+        console.log(equations);
         return;
     }
 
-    addSecond(operation, num, operator);
+    addSecond(op, num, operator);
     console.log(equations);
 }
 
-initializeEquation = operation => {
+initEq = op => {
     if(equations.length === 0 || equations[0].result != null){
-        operation = Object.create(equation);
-        equations.unshift(operation);
+        op = Object.create(equation);
+        equations.unshift(op);
     }else{
-        operation = equations[0];
+        op = equations[0];
     }
 
-    return operation;
+    return op;
 }
 
-addFirst = (operation , num, operator) => {
-    operation.first = num;
-    operation.operator = operator;
+addFirst = (op , num, operator) => {
+    op.first = num;
+    op.operator = operator;
 
     if(operator === "=")
-        temp = finalizeEquation(operation); 
+        lastResult = finalizeEq(op); 
     
     reset();
     eqOutput();
 }
 
-addSecond = (operation , num, operator) => {
-    operation.second = num;
+addSecond = (op , num, operator) => {
+    op.second = num;
 
     if(operator === "=")
-        temp = finalizeEquation(operation); 
+        lastResult = finalizeEq(op); 
     else 
-        handleEquation(finalizeEquation(operation), operator);
+        parseEq(finalizeEq(op), operator);
 
     reset();
     return;
@@ -148,28 +143,37 @@ reset = () => {
     y = 0.1;
 }
 
-finalizeEquation = operation => {
-    if(operation.second === null)
-        operation.result = operation.first;
+finalizeEq = op => {
+    if(op.second === null)
+        op.result = eval(op.first);
     else
-        operation.result = eval(operation.first + 
-                                operation.operator + 
-                                operation.second)
-    
+        op.result = eval(op.first + 
+                         op.operator + 
+                         op.second)
 
-    output(notation(operation.result));
+    console.log(op.result);
+    output(notation(op.result));
 
     eqOutput();
     eqHistory();
-    return operation.result;
+    return op.result;
 }
 
 notation = value => {
+    if(typeof value === 'string'){
+        let match = value.match(/\(([^)]+)\)/);
+
+        if(match[1].length < 9)
+            return '√' + match[1];
+        else 
+            return '√' + Number.parseFloat(match[1]).toExponential(5);
+    }
+
     if(value.toString().length > 9){
         return Number.parseFloat(value).toExponential(5);
-    }else{
+    }else
         return value;
-    }
+    
 }
 
 output = value => {
@@ -182,9 +186,7 @@ output = value => {
             mainOutput.innerText = -(value.join(""));
     }
     else
-        mainOutput.innerText = value;
-
-    
+        mainOutput.innerText = value;    
 }
 
 eqOutput = value => {
@@ -223,7 +225,7 @@ eqHistory = () => {
             + ' ' 
             + (equations[i].operator === '=' ? ' ' : equations[i].operator) 
             + ' ' 
-            + (equations[i].second === null ? ' ' : equations[i].second) + 
+            + (equations[i].second === null ? ' ' : notation(equations[i].second)) + 
         '</p>' 
         + '<p class="answer">' + ' = ' + notation(equations[i].result) + '</p>' 
         + '</div>' ;
@@ -236,7 +238,7 @@ changeOperator = operator => {
     equations[0].operator = operator;
     
     if(operator === '='){
-        temp = finalizeEquation(equations[0]);
+        lastResult = finalizeEq(equations[0]);
         reset();
     }
 
@@ -244,6 +246,19 @@ changeOperator = operator => {
 }
 
 applySymbol = symbol => {
+
+    if(symbol === 'sq-root'){ 
+        console.log('hello')
+        if(num.length === 0 && lastResult === null)
+            return
+
+        let radicand = (num.length === 0) ? lastResult : finalizeOp(num);
+
+        let value = 'Math.sqrt(' + radicand + ')';
+        
+        parseEq(value, '=');
+        return
+    }
 
     if(symbol === 'plus-minus'){
         if(positive === true)
@@ -280,21 +295,23 @@ applySymbol = symbol => {
 
     if(symbol === 'delete'){
         deleteInput();
+        lastResult = null;
         return
     }
 
     if(num.length != 0){
-        handleEquation(finalizeNumber(), symbol);
+        parseEq(finalizeOp(), symbol);
         return;
     }
     
-    if(temp != null){
-        handleEquation(temp, symbol);
-        temp = null;
+    if(lastResult != null){
+        parseEq(lastResult, symbol);
+        lastResult = null;
         return;
     }
 
-    if(equations[0].operator != null){
+    if(equations[0].operator != null &&
+       equations[0].result === null){
         changeOperator(symbol);
         return;
     };
